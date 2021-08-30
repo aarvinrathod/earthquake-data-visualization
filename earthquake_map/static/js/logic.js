@@ -29,28 +29,30 @@ function color_choice(data) {
 
 d3.json(url).then(data => {
     
-    let earthquake_markers = [];
     let points = data.features;
-    
+    let earthquake_marker_group = L.layerGroup()
+
     points.forEach(point => {
                             let lat = point.geometry.coordinates[1];
                             let lng = point.geometry.coordinates[0];
                             let depth = point.geometry.coordinates[2];
                             let coords = [lat, lng, depth]
-                            
-                            earthquake_markers.push(
-                                                L.circle(coords, {
-                                                    stroke: true,
-                                                    color:"black",
-                                                    weight:0.25,
-                                                    fillOpacity: 1,
-                                                    fillColor: color_choice(point.geometry.coordinates[2]),
-                                                    radius: markerSize(point.properties.mag),
-                                                    interactive: true
-                                                    }));
+                            let mag = point.properties.mag
+                            let place = point.properties.place
+                            earthquake_markers = L.circle(coords, {
+                                                          stroke: true,
+                                                          color:"black",
+                                                          weight:0.25,
+                                                          fillOpacity: 1,
+                                                          fillColor: color_choice(point.geometry.coordinates[2]),
+                                                          radius: markerSize(point.properties.mag),
+                                                          interactive: true
+                                                        });
+                            earthquake_markers.bindPopup(`Earthquake Location :${place} : Magnitude: ${mag}`)
+                            earthquake_markers.addTo(earthquake_marker_group)
                                 });
 
-    let earthquake_marker_group = L.layerGroup(earthquake_markers)
+    
     let overlayMaps = {"earthquakes" : earthquake_marker_group}
     // Creating the map object
     var myMap = L.map("map", {
